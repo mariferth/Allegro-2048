@@ -86,9 +86,9 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_EVENT_QUEUE* 
     TECLA 3  -->  CIMA
     TECLA 4  -->  BAIXO
     */
-    int tecla=NULL;
+    int tecla = NULL;
     int fim = 0;
-    while (fim ==0) {
+    while (fim == 0) {
         //Variavel que espera por eventos
         ALLEGRO_EVENT evento;
         al_wait_for_event(fila_eventos, &evento);
@@ -135,9 +135,24 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_EVENT_QUEUE* 
 
         testa_recorde(&pont, &recorde);
         imprime_tabuleiro(tab, &recorde, &pont, janela, fundo);
+        
+        for (int i = 0; i < TAM; i++) {
+            for (int j = 0; j < TAM; j++) {
+                if (tab[i][j] == 2048) {
+                    int ganhou = al_show_native_message_box(janela, "Parabéns! Você ganhou!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+                    if (ganhou == 1) {
+                        restart(janela, fila_eventos, fundo);
+                    }
+                    else {
+                        fim++;
+                        break;
+                    }
+                }
+            }
+        }
 
         if (perde(tab) == 1) {
-            int perdeu = al_show_native_message_box(janela, "Você perdeu!", "Deseja jogar denovo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+            int perdeu = al_show_native_message_box(janela, "Você perdeu!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
             if (perdeu == 1) {
                 restart(janela, fila_eventos, fundo);
             }
