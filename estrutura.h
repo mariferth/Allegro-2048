@@ -97,7 +97,7 @@ void num_aleatorio(int tab[TAM][TAM]) {
         i = rand() % 4;
         j = rand() % 4;
         if (tab[i][j] == 0) {
-            tab[i][j] = (rand() & 3) ? 2 : 4; //Possibilidades: 60% de gerar o número 2 e 40% o número 4.         
+            tab[i][j] = (rand() & 3) ? 1024 : 4; //Possibilidades: 60% de gerar o número 2 e 40% o número 4.         
             aux++;
         }
     }

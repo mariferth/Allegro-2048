@@ -86,6 +86,10 @@
     <Allegro_AddonColor>true</Allegro_AddonColor>
     <Allegro_AddonPrimitives>true</Allegro_AddonPrimitives>
     <Allegro_AddonImage>true</Allegro_AddonImage>
+    <Allegro_AddonAudio>true</Allegro_AddonAudio>
+    <Allegro_AddonAcodec>true</Allegro_AddonAcodec>
+    <Allegro_AddonMemfile>
+    </Allegro_AddonMemfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -155,7 +159,7 @@
   <ItemGroup>
     <ClInclude Include="controles.h" />
     <ClInclude Include="estrutura.h" />
-    <ClInclude Include="Pilha_LE.h" />
+    <ClInclude Include="pilha.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
