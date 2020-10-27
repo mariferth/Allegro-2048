@@ -64,6 +64,7 @@ int main() {
     jogar(janela, fundo, pup);
 
     al_destroy_sample(pup);
+    al_destroy_bitmap(fundo);
     return 0;
 }
 
@@ -137,7 +138,6 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup) 
                 }
             }
             else if (tecla == 0) {
-                restart(janela, fila_eventos, fundo, pup);
                 fim++;
             }
         }
@@ -145,38 +145,53 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup) 
         testa_recorde(&pont, &recorde);
         imprime_tabuleiro(tab, &recorde, &pont, janela, fundo);
         
-        /*for (int i = 0; i < TAM; i++) {
+        for (int i = 0; i < TAM; i++) {
             for (int j = 0; j < TAM; j++) {
                 if (tab[i][j] == 2048) {
-                    int ganhou = al_show_native_message_box(janela, "Parabéns! Você ganhou!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
-                    if (ganhou == 1) {
-                        restart(janela, fila_eventos, fundo);
-                    }
-                    else {
-                        fim++;
-                        break;
-                    }
+                    fim++;
                 }
             }
-        }*/
+        }
 
         if (perde(tab) == 1) {
-            int perdeu = al_show_native_message_box(janela, "Você perdeu!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
-            if (perdeu == 1) {
-                restart(janela, fila_eventos, fundo, pup);
-                fim++;
-            }
-            else {
-                fim++;
-            }
+            fim++;
         }  
     }
-    sair(janela, fila_eventos);
+    if (perde(tab) == 1) {
+        int perdeu = al_show_native_message_box(janela, "Você perdeu!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+        if (perdeu == 1) {
+            sair(janela, fila_eventos);
+            restart(janela, fila_eventos, fundo, pup);
+        }
+        else {
+            sair(janela, fila_eventos);
+        }
+    } 
+    else if (tecla == 0) {
+        sair(janela, fila_eventos);
+        restart(janela, fila_eventos, fundo, pup);
+    }
+
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            if (tab[i][j] == 2048) {
+                int ganhou = al_show_native_message_box(janela, "Parabéns! Você ganhou!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
+                if (ganhou == 1) {
+                    sair(janela, fila_eventos);
+                    restart(janela, fila_eventos, fundo, pup);
+                }
+                else {
+                    sair(janela, fila_eventos);
+                }
+            }
+        }
+    }
+    
 }
 
 //Reinicia o jogo
 void restart(ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup){
-    sair(janela, fila_eventos);
+    //sair(janela, fila_eventos);
 
     //ALLEGRO_DISPLAY* janela = NULL;
     janela = al_create_display(LARGURA_TELA, ALTURA_TELA);
@@ -184,8 +199,8 @@ void restart(ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos, ALLEGRO
     al_set_window_title(janela, "2048");
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
-    fila_eventos = NULL;
-    fila_eventos = al_create_event_queue();
+    /*fila_eventos = NULL;
+    fila_eventos = al_create_event_queue();*/
 
     jogar(janela, fundo, pup);
 }
@@ -195,4 +210,3 @@ void sair (ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos) {
     al_destroy_event_queue(fila_eventos);
     al_destroy_display(janela);
 }
-
