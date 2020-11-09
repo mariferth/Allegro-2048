@@ -25,9 +25,7 @@ int tab[TAM][TAM] = { 0 };
 //Pilha 
 no* L;
 
-void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup);
-void restart(ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup);
-void sair(ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos);
+void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_SAMPLE* pup, ALLEGRO_SAMPLE* win);
 
 int main() {
     //Comando para a pseudoaleatoriedade
@@ -48,29 +46,26 @@ int main() {
     al_set_window_position(janela, 100, 100);
     al_set_window_title(janela, "2048");
     al_clear_to_color(al_map_rgb(255, 255, 255));
-
-    //Fundo 
-    ALLEGRO_BITMAP* fundo = NULL;
-    fundo = al_load_bitmap("background.png");
-    al_draw_bitmap(fundo, 0, 0, 0);
     
     //Som
     ALLEGRO_SAMPLE* pup = NULL;
+    ALLEGRO_SAMPLE* win  = NULL;
 
-    al_reserve_samples(1);
+    al_reserve_samples(2);
 
     pup = al_load_sample("pup.ogg");
+    win = al_load_sample("win.ogg");
 
-    jogar(janela, fundo, pup);
+    jogar(janela, pup, win);
 
+    al_destroy_sample(win);
     al_destroy_sample(pup);
-    al_destroy_bitmap(fundo);
     return 0;
 }
 
 //Função que inicia o jogo
-void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup) {
-    cor_tab = rand() % 10000;
+void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_SAMPLE* pup, ALLEGRO_SAMPLE* win) {
+    cor_tab = rand() % 100;
 
     //fila_eventos
     ALLEGRO_EVENT_QUEUE* fila_eventos = NULL;
@@ -82,7 +77,7 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup) 
 
     //Inicialização tabuleiro
     inicializa_tabuleiro(tab, &pont);
-    imprime_tabuleiro(tab, &recorde, &pont, janela, fundo);
+    imprime_tabuleiro(tab, &recorde, &pont, janela);
     
     /* 
     TECLA 0  -->  NOVO JOGO
@@ -93,114 +88,87 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup) 
     */
 
     int tecla = NULL;
-    int fim = NULL;
+    int fim = 0;
+    int win_flag = 0;
     while (fim == 0) {
+        
         //Variavel que espera por eventos
         ALLEGRO_EVENT evento;
         al_wait_for_event(fila_eventos, &evento);
-
+        if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            if (al_show_native_message_box(janela, "", "Deseja realmente sair?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO) == 1) {
+                fim++;
+            }
+        }
         if (evento.type == ALLEGRO_EVENT_KEY_DOWN) {
             switch (evento.keyboard.keycode) {
-                //N - novo jogo
-            case ALLEGRO_KEY_N:
+            case ALLEGRO_KEY_N: //N - novo jogo
                 tecla = 0;
                 break;
-                //seta para cima
-            case ALLEGRO_KEY_LEFT:
+            case ALLEGRO_KEY_LEFT: //esquerda
                 tecla = 1;
                 break;
-                //seta para baixo
-            case ALLEGRO_KEY_RIGHT:
+            case ALLEGRO_KEY_RIGHT://direita
                 tecla = 2;
                 break;
-                //seta para esquerda
-            case ALLEGRO_KEY_UP:
+            case ALLEGRO_KEY_UP://cima
                 tecla = 3;
                 break;
-                //seta para direita.
-            case ALLEGRO_KEY_DOWN:
+            case ALLEGRO_KEY_DOWN://baixo
                 tecla = 4;
                 break;
-            case ALLEGRO_KEY_ESCAPE:
+            case ALLEGRO_KEY_ESCAPE://sair
                 tecla = 5;
                 break;
             default:
                 tecla = -1;
                 break;
             }
-            if (tecla == 5) {
-                fim++;
+
+            if (tecla == 0) { // N
+                cor_tab = rand() % 10000;
+                win_flag = 0;
+                inicializa_tabuleiro(tab, &pont);
             }
-            else if (tecla != 0) {
+            else if (tecla == 5) { // Esc
+                if (al_show_native_message_box(janela, "", "Deseja realmente sair?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO) == 1) {
+                    fim++;
+                }
+            }
+            else if (tecla > 0 ) { // Setas
                 if (movimentos(tab, tecla, &pont, &L)) {
                     num_aleatorio(tab);
                     al_play_sample(pup, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                 }
+            } 
+        }
+
+        testa_recorde(&pont, &recorde);//Atuliza o record
+        imprime_tabuleiro(tab, &recorde, &pont, janela);
+
+        if (verifica_2048(tab) == 1 && win_flag == 0) { // Verifica se chegou a 2048
+            al_play_sample(win, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            if (al_show_native_message_box(janela, "Você atingiu 2048!", "Deseja iniciar outra partida?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO) == 1) {
+                inicializa_tabuleiro(tab, &pont);
+                imprime_tabuleiro(tab, &recorde, &pont, janela);
+                win_flag = 0;
             }
-            else if (tecla == 0) {
+            else {
+                win_flag = 1;
+            }
+        }
+        if (perde(tab) == 1) { // Perde a partida
+            if (al_show_native_message_box(janela, "Você perdeu!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO) == 1) {
+                cor_tab = rand() % 100;
+                inicializa_tabuleiro(tab, &pont);
+                imprime_tabuleiro(tab, &recorde, &pont, janela);
+            }
+            else {
                 fim++;
             }
         }
+    }//fim do while 
 
-        testa_recorde(&pont, &recorde);
-        imprime_tabuleiro(tab, &recorde, &pont, janela, fundo);
-        
-        for (int i = 0; i < TAM; i++) {
-            for (int j = 0; j < TAM; j++) {
-                if (tab[i][j] == 2048) {
-                    fim++;
-                }
-            }
-        }
-
-        if (perde(tab) == 1) {
-            fim++;
-        }  
-    }
-    if (perde(tab) == 1) {
-        int perdeu = al_show_native_message_box(janela, "Você perdeu!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
-        if (perdeu == 1) {
-            restart(janela, fila_eventos, fundo, pup);
-        }
-        else {
-            sair(janela, fila_eventos);
-        }
-    } 
-    else if (tecla == 0) {
-        restart(janela, fila_eventos, fundo, pup);
-    }
-
-    for (int i = 0; i < TAM; i++) {
-        for (int j = 0; j < TAM; j++) {
-            if (tab[i][j] == 2048) {
-                int ganhou = al_show_native_message_box(janela, "Parabéns! Você ganhou!", "Deseja jogar de novo?", "", NULL, ALLEGRO_MESSAGEBOX_YES_NO);
-                if (ganhou == 1) {
-                    restart(janela, fila_eventos, fundo, pup);
-                }
-                else {
-                    sair(janela, fila_eventos);
-                }
-            }
-        }
-    }
-    
-}
-
-//Reinicia o jogo
-void restart(ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos, ALLEGRO_BITMAP* fundo, ALLEGRO_SAMPLE* pup){
-    sair(janela, fila_eventos);
-
-    //ALLEGRO_DISPLAY* janela = NULL;
-    janela = al_create_display(LARGURA_TELA, ALTURA_TELA);
-    al_set_window_position(janela, 100, 100);
-    al_set_window_title(janela, "2048");
-    al_clear_to_color(al_map_rgb(255, 255, 255));
-
-    jogar(janela, fundo, pup);
-}
-
-//Exclui a janela e a fila de eventos
-void sair (ALLEGRO_DISPLAY* janela, ALLEGRO_EVENT_QUEUE* fila_eventos) {
     al_destroy_event_queue(fila_eventos);
     al_destroy_display(janela);
 }

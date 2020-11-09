@@ -7,6 +7,7 @@ void atualiza_soma(int tab[4][4], int tecla, no** L);
 int movimentos(int tab[4][4], int tecla, int* pont, no** L) {
     int i, j, aux2, aux, soma, move = 1;
     int cont_mov = 0;
+
     switch (tecla) {
     case 1: //Seta para a esquerda   
         for (i = 0; i < 4; i++) {
