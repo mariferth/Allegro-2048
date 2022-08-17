@@ -4,20 +4,19 @@
 #include <iostream>
 using namespace std;
 
-#include "allegro5/allegro.h"
-#include "allegro5/allegro_color.h"
-#include "allegro5/allegro_font.h"
-#include "allegro5/allegro_ttf.h"
-#include "allegro5/allegro_native_dialog.h"
-#include "allegro5/allegro_image.h"
-#include "allegro5/allegro_primitives.h"
-#include "allegro5/allegro_audio.h"
-#include "allegro5/allegro_acodec.h"
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_color.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_acodec.h>
 
-#include "pilha.h" 
-#include "estrutura.h"
-#include "controles.h"
-
+#include "includes/pilha.h" 
+#include "includes/estrutura.h"
+#include "includes/controles.h"
 
 //Tabuleiro global
 int tab[TAM][TAM] = { 0 };
@@ -53,8 +52,8 @@ int main() {
 
     al_reserve_samples(2);
 
-    pup = al_load_sample("pup.ogg");
-    win = al_load_sample("win.ogg");
+    pup = al_load_sample("assets/sounds/pup.ogg");
+    win = al_load_sample("assets/sounds/win.ogg");
 
     jogar(janela, pup, win);
 
@@ -87,7 +86,7 @@ void jogar(ALLEGRO_DISPLAY* janela, ALLEGRO_SAMPLE* pup, ALLEGRO_SAMPLE* win) {
     TECLA 4  -->  BAIXO
     */
 
-    int tecla = NULL;
+    int tecla = 0;
     int fim = 0;
     int win_flag = 0;
     while (fim == 0) {

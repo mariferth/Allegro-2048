@@ -46,7 +46,7 @@ void imprime_tabuleiro(int tab[4][4], int* recorde, int* pont, ALLEGRO_DISPLAY* 
     ALLEGRO_FONT* fonte = NULL;
  
     //Carregando o arquivo de fonte com uma true type font
-    fonte = al_load_font("JandaManateeSolid.ttf", 36, 0);
+    fonte = al_load_font("assets/fonts/JandaManateeSolid.ttf", 36, 0);
 
     //Limpa o tabuleiro
     al_clear_to_color(al_map_rgb(205, 192, 180));
@@ -102,7 +102,7 @@ void num_aleatorio(int tab[TAM][TAM]) {
         i = rand() % 4;
         j = rand() % 4;
         if (tab[i][j] == 0) {
-            tab[i][j] = (rand() & 3) ? 512 : 1024; //Possibilidades: 60% de gerar o número 2 e 40% o número 4.         
+            tab[i][j] = (rand() & 3) ? 2 : 4; //Possibilidades: 60% de gerar o número 2 e 40% o número 4.         
             aux++;
         }
     }
